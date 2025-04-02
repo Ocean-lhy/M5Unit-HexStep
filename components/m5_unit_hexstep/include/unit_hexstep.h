@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
+#include "i2c_bus.h"
 #define UNIT_HEXSTEP_DEFAULT_I2C_ADDRESS 0x48
 
 #define UNIT_HEXSTEP_REG_VALUE          0x00
@@ -12,6 +12,7 @@
 #define UNIT_HEXSTEP_REG_SWITCH         0x30
 #define UNIT_HEXSTEP_REG_RGB_CONFIG     0x40
 #define UNIT_HEXSTEP_REG_RGB_BRIGHTNESS 0x41
+#define UNIT_HEXSTEP_REG_RGB_VALUE      0x50
 #define UNIT_HEXSTEP_REG_R_VALUE        0x50
 #define UNIT_HEXSTEP_REG_G_VALUE        0x51
 #define UNIT_HEXSTEP_REG_B_VALUE        0x52
@@ -63,5 +64,22 @@ int unit_hexstep_get_version(unit_hexstep_t *dev, uint8_t *version);
 
 int unit_hexstep_get_address(unit_hexstep_t *dev, uint8_t *address);
 int unit_hexstep_set_address(unit_hexstep_t *dev, uint8_t address);
+
+int unit_hexstep_set_default_config(unit_hexstep_t *dev);
+
+void unit_hexstep_test_case_1(unit_hexstep_t *dev);
+void unit_hexstep_test_case_2(unit_hexstep_t *dev);
+void unit_hexstep_test_case_3(unit_hexstep_t *dev);
+void unit_hexstep_test_case_4(unit_hexstep_t *dev);
+void unit_hexstep_test_case_5(unit_hexstep_t *dev);
+void unit_hexstep_test_case_6(unit_hexstep_t *dev);
+void unit_hexstep_test_case_7(unit_hexstep_t *dev);
+void unit_hexstep_test_case_8(unit_hexstep_t *dev);
+void unit_hexstep_test_case_9(unit_hexstep_t *dev);
+void unit_hexstep_test_case_10(unit_hexstep_t *dev);
+void unit_hexstep_test_case_11(unit_hexstep_t *dev, i2c_bus_handle_t i2c_handle);
+void unit_hexstep_test_case_press(unit_hexstep_t *dev);
+
+void unit_hexstep_simple_demo(unit_hexstep_t *dev);
 
 #endif
