@@ -239,6 +239,19 @@ int unit_hexstep_get_rgb(unit_hexstep_t *dev, uint8_t *r, uint8_t *g, uint8_t *b
     *b = rgb[2];
     return 0;
 }
+int unit_hexstep_set_r_value(unit_hexstep_t *dev, uint8_t r)
+{
+    return unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_R_VALUE, &r, 1);
+}
+int unit_hexstep_set_g_value(unit_hexstep_t *dev, uint8_t g)
+{
+    return unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_G_VALUE, &g, 1);
+}
+int unit_hexstep_set_b_value(unit_hexstep_t *dev, uint8_t b)
+{
+    return unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_B_VALUE, &b, 1);
+}
+
 
 /**
  * @brief 设置灵敏度

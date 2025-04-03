@@ -21,6 +21,8 @@
 #define UNIT_HEXSTEP_REG_VERSION        0xFE
 #define UNIT_HEXSTEP_REG_ADDRESS        0xFF
 
+#define UNIT_HEXSTEP_REG_RGB_DEMO       0x70
+
 // 回调函数类型定义
 typedef int (*unit_hexstep_read_reg_cb_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len);
 typedef int (*unit_hexstep_write_reg_cb_t)(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len);
@@ -55,6 +57,9 @@ int unit_hexstep_set_rgb_brightness(unit_hexstep_t *dev, uint8_t brightness);
 int unit_hexstep_get_rgb_brightness(unit_hexstep_t *dev, uint8_t *brightness);
 int unit_hexstep_set_rgb(unit_hexstep_t *dev, uint8_t r, uint8_t g, uint8_t b);
 int unit_hexstep_get_rgb(unit_hexstep_t *dev, uint8_t *r, uint8_t *g, uint8_t *b);
+int unit_hexstep_set_r_value(unit_hexstep_t *dev, uint8_t r);
+int unit_hexstep_set_g_value(unit_hexstep_t *dev, uint8_t g);
+int unit_hexstep_set_b_value(unit_hexstep_t *dev, uint8_t b);
 
 int unit_hexstep_set_sensitivity(unit_hexstep_t *dev, uint8_t sensitivity);
 int unit_hexstep_get_sensitivity(unit_hexstep_t *dev, uint8_t *sensitivity);
