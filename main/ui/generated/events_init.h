@@ -18,7 +18,10 @@ extern "C" {
 
 void events_init(lv_ui *ui);
 
-void events_init_screen(lv_ui *ui);
+void events_init_screen_detect(lv_ui *ui);
+void events_init_screen_roll(lv_ui *ui);
+void events_init_screen_led(lv_ui *ui);
+void events_init_screen_RGB(lv_ui *ui);
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,7 @@
 #include "unit_hexstep.h"
 #include "i2c_bus.h"
 #include "config.h"
+#include "iot_button.h"
 
 #include "gui_guider.h"
 
@@ -21,6 +22,14 @@ i2c_bus_device_handle_t hexstep_dev_handle;
 lv_ui guider_ui;
 
 QueueHandle_t lv_command_queue;
+
+button_handle_t btn_left = NULL;
+button_handle_t btn_middle = NULL;
+button_handle_t btn_right = NULL;
+
+uint8_t btn_left_press_flag = 0;
+uint8_t btn_middle_press_flag = 0;
+uint8_t btn_right_press_flag = 0;
 
 static int i2c_read_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len)
 {
@@ -173,7 +182,8 @@ static void hexstep_task(void *arg)
 static void guider_task(void *arg)
 {
     uint8_t value, led_config, led_brightness, led_switch, rgb_config, rgb_brightness, r_value, g_value, b_value, sensitivity, address, version;
-    int ret = unit_hexstep_get_value(&hexstep_dev, &value);
+    int ret = 0;
+    unit_hexstep_get_value(&hexstep_dev, &value);
     ret |= unit_hexstep_get_led_config(&hexstep_dev, &led_config);
     ret |= unit_hexstep_get_led_brightness(&hexstep_dev, &led_brightness);
     ret |= unit_hexstep_get_switch_state(&hexstep_dev, &led_switch);
@@ -183,95 +193,339 @@ static void guider_task(void *arg)
     ret |= unit_hexstep_get_sensitivity(&hexstep_dev, &sensitivity);
     ret |= unit_hexstep_get_address(&hexstep_dev, &address);
     ret |= unit_hexstep_get_version(&hexstep_dev, &version);
-    bsp_display_lock(0);
-    lv_obj_clear_flag(guider_ui.screen, LV_OBJ_FLAG_SCROLLABLE);
-    // update data
-    if (ret != 0) 
-    {
-        lv_label_set_text(guider_ui.screen_label_value, "ERR");
-    }
-    else
-    {
-        char text[32] = {0};
-        snprintf(text, sizeof(text), "%01X", value);
-        lv_label_set_text(guider_ui.screen_label_value, text);
-        lv_meter_set_indicator_value(guider_ui.screen_meter_1, guider_ui.screen_meter_1_scale_0_ndline_0, led_switch ? value : 16-value);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "led sleep %ds", led_config);
-        lv_label_set_text(guider_ui.screen_label_led_config, text);
-        lv_slider_set_value(guider_ui.screen_slider_led_config, led_config, LV_ANIM_OFF);
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "brightness %d%%", led_brightness);
-        lv_label_set_text(guider_ui.screen_label_led_brightness, text);
-        lv_slider_set_value(guider_ui.screen_slider_led_brightness, led_brightness, LV_ANIM_OFF);
-
-        if (led_switch == 1)
-        {
-            lv_obj_add_state(guider_ui.screen_sw_reversal, LV_STATE_CHECKED);
-        }
-        else
-        {
-            lv_obj_clear_flag(guider_ui.screen_sw_reversal, LV_STATE_CHECKED);
-        }
-
-        if (rgb_config == 1)
-        {
-            lv_obj_add_state(guider_ui.screen_sw_rgb, LV_STATE_CHECKED);
-        }
-        else
-        {
-            lv_obj_clear_flag(guider_ui.screen_sw_rgb, LV_STATE_CHECKED);
-        }
-
-        lv_slider_set_value(guider_ui.screen_slider_rgb, rgb_brightness, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "R: %d", r_value);
-        lv_label_set_text(guider_ui.screen_label_R, text);
-        lv_slider_set_value(guider_ui.screen_slider_R, r_value, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "G: %d", g_value);
-        lv_label_set_text(guider_ui.screen_label_G, text);
-        lv_slider_set_value(guider_ui.screen_slider_G, g_value, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "B: %d", b_value);
-        lv_label_set_text(guider_ui.screen_label_B, text);
-        lv_slider_set_value(guider_ui.screen_slider_B, b_value, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "sensitivity: %d%%", sensitivity);
-        lv_label_set_text(guider_ui.screen_label_sensitivity, text);
-        lv_slider_set_value(guider_ui.screen_slider_sensitivity, sensitivity, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "addr: 0x%02X", address);
-        lv_label_set_text(guider_ui.screen_label_addr, text);
-
-        memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "version: %d", version);
-        lv_label_set_text(guider_ui.screen_label_version, text);
-    }
-    bsp_display_unlock();
     uint8_t last_value = value;
+    uint8_t test_index = 0; // 0: 设备检测中 1: 设备测试完成 2: 准备开始测试 255: 测试中断
     while (1) 
     {
-        unit_hexstep_get_value(&hexstep_dev, &value);
-        unit_hexstep_get_switch_state(&hexstep_dev, &led_switch);
-        if (last_value != value)
+        // find device
+        while (1)
         {
+            ret = unit_hexstep_get_address(&hexstep_dev, &address);
+            ret |= unit_hexstep_get_version(&hexstep_dev, &version);
+            if (ret != 0)
+            {
+                ESP_LOGE(TAG, "获取地址或版本失败");
+                bsp_display_lock(0);
+                lv_obj_set_style_bg_color(guider_ui.screen_detect, lv_color_hex(0xffff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                lv_label_set_text(guider_ui.screen_detect_label_detect, "设备检测中...\n\n设备地址：ERR\n\n固件版本：ERR\n\n请将设备插入PORT.A口");
+                bsp_display_unlock();
+                test_index = 0;
+                vTaskDelay(1000 / portTICK_PERIOD_MS);
+            }
+            else
+            if (test_index == 1)
+            {
+                bsp_display_lock(0);
+                lv_obj_set_style_bg_color(guider_ui.screen_detect, lv_color_hex(0x00ff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                lv_label_set_text(guider_ui.screen_detect_label_detect, "设备测试完成\n\n请拔下设备更换待测设备");
+                bsp_display_unlock();
+            }
+            else
+            if (test_index == 255)
+            {
+                ESP_LOGI(TAG, "测试中断");
+                bsp_display_lock(0);
+                ui_load_scr_animation(&guider_ui, &guider_ui.screen_detect, guider_ui.screen_detect_del, &guider_ui.screen_RGB_del, setup_scr_screen_detect, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+                bsp_display_unlock();
+                test_index = 0;
+            }
+            else
+            {
+                char text[128];
+                snprintf(text, sizeof(text), "设备连接成功\n\n设备地址：0x%02X\n\n固件版本：%d\n\n按右键开始测试", address, version);
+                bsp_display_lock(0);
+                lv_obj_set_style_bg_color(guider_ui.screen_detect, lv_color_hex(0x00ff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                lv_label_set_text(guider_ui.screen_detect_label_detect, text);
+                bsp_display_unlock();
+                test_index = 2;
+            }
+            if (test_index == 2 && (btn_middle_press_flag == 1 || btn_right_press_flag == 1))
+            {
+                ESP_LOGI(TAG, "开始测试");
+                bsp_display_lock(0);
+                ui_load_scr_animation(&guider_ui, &guider_ui.screen_roll, guider_ui.screen_roll_del, &guider_ui.screen_detect_del, setup_scr_screen_roll, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+                bsp_display_unlock();
+                break;
+            }
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+        }
+        // roll test
+        ESP_LOGI(TAG, "开始旋钮测试");
+        uint8_t last_val = 0;
+        uint8_t valid_val = 0; // 记录上一次有效计数的值
+        uint8_t total_roll = 0;
+        unit_hexstep_set_sensitivity(&hexstep_dev, 100);
+        unit_hexstep_get_value(&hexstep_dev, &last_val);
+        valid_val = last_val;
+
+        while (1)
+        {
+            if (btn_left_press_flag == 1)
+            {
+                ESP_LOGI(TAG, "左键按下，退出测试");
+                test_index = 255;
+                esp_restart();
+            }
+            
+            ret = unit_hexstep_get_value(&hexstep_dev, &value);
+            if (ret != 0)
+            {
+                ESP_LOGE(TAG, "获取值失败");
+                continue;
+            }
+            
+            // 检测到有效递增（顺时针旋转一格）且值必须超过上次有效值
+            if (((valid_val == 15 && value == 0) || (value == valid_val + 1)) && 
+                (value != last_val)) // 确保与上次读取的值不同
+            {
+                total_roll++;
+                ESP_LOGI(TAG, "检测到有效旋转: %d -> %d, 总计: %d/48", valid_val, value, total_roll);
+                valid_val = value; // 更新有效值
+                char text[8];
+                snprintf(text, sizeof(text), "%d", valid_val);
+                lv_label_set_text(guider_ui.screen_roll_label_1, text);
+            }
+            
+            last_val = value; // 记录本次读取的值
+            
             bsp_display_lock(0);
-            char text[32] = {0};
-            snprintf(text, sizeof(text), "%01X", value);
-            lv_label_set_text(guider_ui.screen_label_value, text);
-            lv_meter_set_indicator_value(guider_ui.screen_meter_1, guider_ui.screen_meter_1_scale_0_ndline_0, led_switch ? value : 16-value);
-            last_value = value;
+            lv_meter_set_indicator_value(guider_ui.screen_roll_meter_roll, guider_ui.screen_roll_meter_roll_scale_0_ndline_0, value);
+            
+            // 更新进度条，每次旋转增加2个单位
+            lv_textprogress_set_value(guider_ui.screen_roll_textprogress_roll, total_roll * 2);
+            
+            // 检查是否完成三圈
+            if (total_roll >= 48)
+            {
+                ESP_LOGI(TAG, "完成三圈旋转测试");
+                lv_textprogress_set_value(guider_ui.screen_roll_textprogress_roll, 100);
+                lv_obj_set_style_bg_color(guider_ui.screen_roll, lv_color_hex(0x00ff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                lv_label_set_text(guider_ui.screen_roll_label_roll, "旋钮测试完成\n按右键继续下一项测试");
+                bsp_display_unlock();
+                break;
+            }
+            
             bsp_display_unlock();
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+        }
+        while (1)
+        {
+            if (btn_right_press_flag == 1 || btn_middle_press_flag == 1)
+            {
+                bsp_display_lock(0);
+                ui_load_scr_animation(&guider_ui, &guider_ui.screen_led, guider_ui.screen_led_del, &guider_ui.screen_roll_del, setup_scr_screen_led, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+                bsp_display_unlock();
+                break;
+            }
+            if (btn_left_press_flag == 1)
+            {
+                ESP_LOGI(TAG, "左键按下，退出测试");
+                test_index = 255;
+                esp_restart();
+            }
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+        }
+        ESP_LOGI(TAG, "开始数码管测试");
+        unit_hexstep_set_led_config(&hexstep_dev, 0xFF);
+        // led test
+        while (1)
+        {
+            if (btn_left_press_flag == 1)
+            {
+                ESP_LOGI(TAG, "左键按下，退出测试");
+                test_index = 255;
+                esp_restart();
+            }
+            ret = unit_hexstep_get_value(&hexstep_dev, &value);
+            if (ret != 0 || btn_left_press_flag == 1)
+            {
+                ESP_LOGE(TAG, "获取值失败");
+                test_index = 255;
+                continue;
+            }
+            bsp_display_lock(0);
+            if (value == 8)
+            {
+                lv_label_set_text(guider_ui.screen_led_label_led_num, "8");
+                lv_obj_set_style_bg_color(guider_ui.screen_led, lv_color_hex(0x00ff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                led_brightness += 10;
+                if (led_brightness > 200)
+                {
+                    led_brightness = 0;
+                }
+                lv_slider_set_value(guider_ui.screen_led_slider_led, led_brightness > 100 ? 200-led_brightness : led_brightness, LV_ANIM_OFF);
+                lv_label_set_text(guider_ui.screen_led_label_led, "观察数码管亮度效果\n按右键继续下一项测试");
+                if (btn_right_press_flag == 1)
+                {
+                    ui_load_scr_animation(&guider_ui, &guider_ui.screen_RGB, guider_ui.screen_RGB_del, &guider_ui.screen_led_del, setup_scr_screen_RGB, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+                    bsp_display_unlock();
+                    break;
+                }
+            }
+            else
+            {
+                char text[8];
+                snprintf(text, sizeof(text), "%d", value);
+                lv_label_set_text(guider_ui.screen_led_label_led_num, text);
+                lv_obj_set_style_bg_color(guider_ui.screen_led, lv_color_hex(0xffff00), LV_PART_MAIN|LV_STATE_DEFAULT);
+                lv_label_set_text(guider_ui.screen_led_label_led, "将数字旋转到8\n观察数码管亮度效果");
+            }
+            bsp_display_unlock();
+            unit_hexstep_set_led_brightness(&hexstep_dev, led_brightness > 100 ? 200-led_brightness : led_brightness);
+            vTaskDelay(5 / portTICK_PERIOD_MS);
+        }
+        ESP_LOGI(TAG, "开始RGB测试");
+        unit_hexstep_set_rgb_config(&hexstep_dev, 1);
+        unit_hexstep_set_rgb_brightness(&hexstep_dev, 100);
+        // rgb test
+        uint8_t rgb_index = 0;
+        uint8_t rgb_done = 0;
+        uint8_t btn_middle_last_state = 0; // 记录中键上一次状态
+
+        while (1)
+        {
+            if (btn_left_press_flag == 1)
+            {
+                ESP_LOGI(TAG, "左键按下，退出测试");
+                test_index = 255;
+                esp_restart();
+            }
+            
+            switch (rgb_index)
+            {
+                case 0:
+                    unit_hexstep_set_rgb(&hexstep_dev, 255, 0, 0);
+                    bsp_display_lock(0);
+                    lv_led_set_color(guider_ui.screen_RGB_led_RGB, lv_color_hex(0xff0000));
+                    bsp_display_unlock();
+                    break;
+                case 1:
+                    unit_hexstep_set_rgb(&hexstep_dev, 0, 255, 0);
+                    bsp_display_lock(0);
+                    lv_led_set_color(guider_ui.screen_RGB_led_RGB, lv_color_hex(0x00ff00));
+                    bsp_display_unlock();
+                    break;
+                case 2:
+                    unit_hexstep_set_rgb(&hexstep_dev, 0, 0, 255);
+                    bsp_display_lock(0);
+                    lv_led_set_color(guider_ui.screen_RGB_led_RGB, lv_color_hex(0x0000ff));
+                    bsp_display_unlock();
+                    break;
+            }
+            
+            // 检测按键上升沿：之前未按下，现在按下
+            if (btn_middle_press_flag == 1 && btn_middle_last_state == 0)
+            {
+                rgb_index++;
+                if (rgb_index > 2)
+                {
+                    rgb_index = 0;
+                    rgb_done = 1;
+                    bsp_display_lock(0);
+                    lv_obj_set_style_bg_color(guider_ui.screen_RGB, lv_color_hex(0x009600), LV_PART_MAIN|LV_STATE_DEFAULT);
+                    lv_label_set_text(guider_ui.screen_RGB_label_RGB, "RGB测试完成，按右键结束测试\n按中间按键切换RGB颜色");
+                    bsp_display_unlock();
+                }
+            }
+            
+            // 保存当前按键状态用于下次比较
+            btn_middle_last_state = btn_middle_press_flag;
+            
+            if (rgb_done == 1 && btn_right_press_flag == 1)
+            {
+                test_index = 1;
+                bsp_display_lock(0);
+                ui_load_scr_animation(&guider_ui, &guider_ui.screen_detect, guider_ui.screen_detect_del, &guider_ui.screen_RGB_del, setup_scr_screen_detect, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+                bsp_display_unlock();
+                break;
+            }
+            
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
         vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms延时
     }
+}
+
+static void button_left_press_down_cb(void *arg, void *data)
+{
+    btn_left_press_flag = 1;
+    ESP_LOGI(TAG, "左键按下");
+}
+
+static void button_left_press_up_cb(void *arg, void *data)
+{
+    btn_left_press_flag = 0;
+    ESP_LOGI(TAG, "左键抬起");
+}
+
+static void button_middle_press_down_cb(void *arg, void *data)
+{
+    btn_middle_press_flag = 1;
+    ESP_LOGI(TAG, "中键按下");
+}
+
+static void button_middle_press_up_cb(void *arg, void *data)
+{
+    btn_middle_press_flag = 0;
+    ESP_LOGI(TAG, "中键抬起");
+}
+
+static void button_right_press_down_cb(void *arg, void *data)
+{
+    btn_right_press_flag = 1;
+    ESP_LOGI(TAG, "右键按下");
+}
+
+static void button_right_press_up_cb(void *arg, void *data)
+{
+    btn_right_press_flag = 0;
+    ESP_LOGI(TAG, "右键抬起");
+}
+
+static void button_init(void)
+{
+    button_config_t btn_left_cfg = {
+        .type = BUTTON_TYPE_GPIO,
+        .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+        .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
+        .gpio_button_config = {
+            .gpio_num = PORT_BUTTON_LEFT,
+            .active_level = 0,
+        },
+    };
+    
+    button_config_t btn_middle_cfg = {
+        .type = BUTTON_TYPE_GPIO,
+        .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+        .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
+        .gpio_button_config = {
+            .gpio_num = PORT_BUTTON_MIDDLE,
+            .active_level = 0,
+        },
+    };
+    
+    button_config_t btn_right_cfg = {
+        .type = BUTTON_TYPE_GPIO,
+        .long_press_time = CONFIG_BUTTON_LONG_PRESS_TIME_MS,
+        .short_press_time = CONFIG_BUTTON_SHORT_PRESS_TIME_MS,
+        .gpio_button_config = {
+            .gpio_num = PORT_BUTTON_RIGHT,
+            .active_level = 0,
+        },
+    };
+    
+    btn_left = iot_button_create(&btn_left_cfg);
+    btn_middle = iot_button_create(&btn_middle_cfg);
+    btn_right = iot_button_create(&btn_right_cfg);
+    
+    iot_button_register_cb(btn_left, BUTTON_PRESS_DOWN, button_left_press_down_cb, NULL);
+    iot_button_register_cb(btn_left, BUTTON_PRESS_UP, button_left_press_up_cb, NULL);
+    
+    iot_button_register_cb(btn_middle, BUTTON_PRESS_DOWN, button_middle_press_down_cb, NULL);
+    iot_button_register_cb(btn_middle, BUTTON_PRESS_UP, button_middle_press_up_cb, NULL);
+    
+    iot_button_register_cb(btn_right, BUTTON_PRESS_DOWN, button_right_press_down_cb, NULL);
+    iot_button_register_cb(btn_right, BUTTON_PRESS_UP, button_right_press_up_cb, NULL);
 }
 
 void app_main(void)
@@ -284,6 +538,8 @@ void app_main(void)
         return;
     }
 
+    button_init();
+    
     bsp_i2c_init();
 
     bsp_display_start();
@@ -307,10 +563,10 @@ void app_main(void)
     i2c_handle = i2c_bus_create(PORT_NUM, &conf);
     uint8_t address = 0;
     i2c_bus_scan(i2c_handle, &address, 1);
-    hexstep_dev_handle = i2c_bus_device_create(i2c_handle, address, 0);
+    hexstep_dev_handle = i2c_bus_device_create(i2c_handle, UNIT_HEXSTEP_DEFAULT_I2C_ADDRESS, 0);
 
 
-    int ret = unit_hexstep_init(&hexstep_dev, address, i2c_read_reg, i2c_write_reg);
+    int ret = unit_hexstep_init(&hexstep_dev, UNIT_HEXSTEP_DEFAULT_I2C_ADDRESS, i2c_read_reg, i2c_write_reg);
     if (ret != 0) {
         ESP_LOGE(TAG, "HexStep初始化失败");
         return;
@@ -340,7 +596,7 @@ void app_main(void)
 
     ESP_LOGI(TAG, "HexStep初始化完成");
     
-    xTaskCreate(hexstep_task, "hexstep_task", 4096, NULL, 10, NULL);
-    xTaskCreate(guider_task, "guider_task", 4096, NULL, 10, NULL);
+    // xTaskCreate(hexstep_task, "hexstep_task", 4096, NULL, 10, NULL);
+    xTaskCreate(guider_task, "guider_task", 10240, NULL, 10, NULL);
 }
 

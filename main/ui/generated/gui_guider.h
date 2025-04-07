@@ -14,42 +14,32 @@ extern "C" {
 #endif
 
 #include "lvgl.h"
+#include "lv_textprogress.h"
 
 typedef struct
 {
   
-	lv_obj_t *screen;
-	bool screen_del;
-	lv_obj_t *screen_meter_1;
-	lv_meter_scale_t *screen_meter_1_scale_0;
-	lv_meter_indicator_t *screen_meter_1_scale_0_ndline_0;
-	lv_meter_indicator_t *screen_meter_1_scale_0_arc_0;
-	lv_meter_indicator_t *screen_meter_1_scale_0_scaleline_0;
-	lv_obj_t *screen_label_value;
-	lv_obj_t *screen_slider_led_config;
-	lv_obj_t *screen_label_led_config;
-	lv_obj_t *screen_label_led_brightness;
-	lv_obj_t *screen_slider_led_brightness;
-	lv_obj_t *screen_sw_reversal;
-	lv_obj_t *screen_label_RGB;
-	lv_obj_t *screen_sw_rgb;
-	lv_obj_t *screen_slider_rgb;
-	lv_obj_t *screen_label_addr;
-	lv_obj_t *screen_label_version;
-	lv_obj_t *screen_btn_save_led;
-	lv_obj_t *screen_btn_save_led_label;
-	lv_obj_t *screen_btn_save_rgb;
-	lv_obj_t *screen_btn_save_rgb_label;
-	lv_obj_t *screen_label_R;
-	lv_obj_t *screen_label_G;
-	lv_obj_t *screen_label_B;
-	lv_obj_t *screen_slider_R;
-	lv_obj_t *screen_slider_G;
-	lv_obj_t *screen_slider_B;
-	lv_obj_t *screen_label_sensitivity;
-	lv_obj_t *screen_slider_sensitivity;
-	lv_obj_t *screen_btn_rgb_demo;
-	lv_obj_t *screen_btn_rgb_demo_label;
+	lv_obj_t *screen_detect;
+	bool screen_detect_del;
+	lv_obj_t *screen_detect_label_detect;
+	lv_obj_t *screen_detect_label_1;
+	lv_obj_t *screen_roll;
+	bool screen_roll_del;
+	lv_obj_t *screen_roll_textprogress_roll;
+	lv_obj_t *screen_roll_label_roll;
+	lv_obj_t *screen_roll_meter_roll;
+	lv_meter_scale_t *screen_roll_meter_roll_scale_0;
+	lv_meter_indicator_t *screen_roll_meter_roll_scale_0_ndline_0;
+	lv_obj_t *screen_roll_label_1;
+	lv_obj_t *screen_led;
+	bool screen_led_del;
+	lv_obj_t *screen_led_label_led;
+	lv_obj_t *screen_led_slider_led;
+	lv_obj_t *screen_led_label_led_num;
+	lv_obj_t *screen_RGB;
+	bool screen_RGB_del;
+	lv_obj_t *screen_RGB_label_RGB;
+	lv_obj_t *screen_RGB_led_RGB;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -73,10 +63,16 @@ void init_keyboard(lv_ui *ui);
 extern lv_ui guider_ui;
 
 
-void setup_scr_screen(lv_ui *ui);
+void setup_scr_screen_detect(lv_ui *ui);
+void setup_scr_screen_roll(lv_ui *ui);
+void setup_scr_screen_led(lv_ui *ui);
+void setup_scr_screen_RGB(lv_ui *ui);
 
-LV_FONT_DECLARE(lv_font_montserratMedium_12)
+LV_FONT_DECLARE(lv_font_hei_20)
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
+LV_FONT_DECLARE(lv_font_montserratMedium_12)
+LV_FONT_DECLARE(lv_font_montserratMedium_43)
+LV_FONT_DECLARE(lv_font_montserratMedium_34)
 
 
 #ifdef __cplusplus

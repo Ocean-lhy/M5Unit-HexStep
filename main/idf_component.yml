@@ -2,7 +2,7 @@
 dependencies:
   idf:
     version: '>=5.1.0'
-  espressif/m5stack_core_s3:
-    version: ^2.0.1
+  # espressif/m5stack_core_s3:
+  #   version: ^2.0.1
   lvgl/lvgl: ==8.4.0
   espressif/i2c_bus: =*
