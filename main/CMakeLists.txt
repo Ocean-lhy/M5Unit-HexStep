@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRCS "*.c"
+file(GLOB_RECURSE SRCS "main.c" "*.c"
                     "ui/*.c"
                     "ui/custom/*.c" 
                     "ui/generated/*.c" 

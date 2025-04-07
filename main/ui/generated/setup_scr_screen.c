@@ -471,7 +471,7 @@ void setup_scr_screen(lv_ui *ui)
 
     //Write codes screen_slider_R
     ui->screen_slider_R = lv_slider_create(ui->screen);
-    lv_slider_set_range(ui->screen_slider_R, 0, 100);
+    lv_slider_set_range(ui->screen_slider_R, 0, 255);
     lv_slider_set_mode(ui->screen_slider_R, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_R, 0, LV_ANIM_OFF);
     lv_obj_set_pos(ui->screen_slider_R, 60, 114);
@@ -499,7 +499,7 @@ void setup_scr_screen(lv_ui *ui)
 
     //Write codes screen_slider_G
     ui->screen_slider_G = lv_slider_create(ui->screen);
-    lv_slider_set_range(ui->screen_slider_G, 0, 100);
+    lv_slider_set_range(ui->screen_slider_G, 0, 255);
     lv_slider_set_mode(ui->screen_slider_G, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_G, 0, LV_ANIM_OFF);
     lv_obj_set_pos(ui->screen_slider_G, 60, 136);
@@ -527,7 +527,7 @@ void setup_scr_screen(lv_ui *ui)
 
     //Write codes screen_slider_B
     ui->screen_slider_B = lv_slider_create(ui->screen);
-    lv_slider_set_range(ui->screen_slider_B, 0, 100);
+    lv_slider_set_range(ui->screen_slider_B, 0, 255);
     lv_slider_set_mode(ui->screen_slider_B, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_B, 0, LV_ANIM_OFF);
     lv_obj_set_pos(ui->screen_slider_B, 60, 159);

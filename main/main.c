@@ -28,15 +28,33 @@ QueueHandle_t lv_command_queue;
 
 static int i2c_read_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len)
 {
-    int ret = i2c_bus_read_bytes(hexstep_dev_handle, reg_addr, len, data);
-    // ESP_LOGI(TAG, "读取寄存器: 0x%02X, 数据: 0x%02X\n", reg_addr, data[0]);
+    int ret = 1;
+    for (int i = 0; i < 3; i++) // retry 3 times
+    {
+        ret = i2c_bus_read_bytes(hexstep_dev_handle, reg_addr, len, data);
+        // ESP_LOGI(TAG, "读取寄存器: 0x%02X, 数据: 0x%02X\n", reg_addr, data[0]);
+        if (ret == 0)
+        {
+            break;
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
     return ret;
 }
 
 static int i2c_write_reg(uint8_t dev_addr, uint8_t reg_addr, uint8_t *data, uint8_t len)
 {
-    int ret = i2c_bus_write_bytes(hexstep_dev_handle, reg_addr, len, data);
-    // ESP_LOGI(TAG, "写入寄存器: 0x%02X, 数据: 0x%02X\n", reg_addr, data[0]);
+    int ret = 1;
+    for (int i = 0; i < 3; i++) // retry 3 times
+    {
+        ret = i2c_bus_write_bytes(hexstep_dev_handle, reg_addr, len, data);
+        // ESP_LOGI(TAG, "写入寄存器: 0x%02X, 数据: 0x%02X\n", reg_addr, data[0]);
+        if (ret == 0)
+        {
+            break;
+        }
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
     return ret;
 }
 
@@ -279,6 +297,8 @@ void app_main(void)
     setup_ui(&guider_ui);
 
     bsp_display_unlock();
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
 
     i2c_config_t conf = {
         .mode = I2C_MODE_MASTER,
