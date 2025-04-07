@@ -7,15 +7,11 @@
 #include "esp_log.h"
 #include "unit_hexstep.h"
 #include "i2c_bus.h"
+#include "config.h"
 
 #include "gui_guider.h"
 
 static const char *TAG = "HexStep";
-
-#define PORT_NUM I2C_NUM_0
-#define PORT_SCL 1
-#define PORT_SDA 2
-#define PORT_FREQ 400000
 
 unit_hexstep_t hexstep_dev;
 
