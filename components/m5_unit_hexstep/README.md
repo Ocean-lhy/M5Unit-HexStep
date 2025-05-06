@@ -59,9 +59,6 @@ unit_hexstep_get_switch_state(&hexstep_dev, &state);
 // 设置RGB颜色
 unit_hexstep_set_rgb(&hexstep_dev, r, g, b);
 
-// 设置灵敏度
-unit_hexstep_set_sensitivity(&hexstep_dev, sensitivity);
-
 // 保存配置到Flash
 unit_hexstep_save_to_flash(&hexstep_dev);
 

@@ -16,7 +16,6 @@
 #define UNIT_HEXSTEP_REG_R_VALUE        0x50
 #define UNIT_HEXSTEP_REG_G_VALUE        0x51
 #define UNIT_HEXSTEP_REG_B_VALUE        0x52
-#define UNIT_HEXSTEP_REG_SENSITIVITY    0x60
 #define UNIT_HEXSTEP_REG_SAVE_FLASH     0xF0
 #define UNIT_HEXSTEP_REG_VERSION        0xFE
 #define UNIT_HEXSTEP_REG_ADDRESS        0xFF
@@ -60,9 +59,6 @@ int unit_hexstep_get_rgb(unit_hexstep_t *dev, uint8_t *r, uint8_t *g, uint8_t *b
 int unit_hexstep_set_r_value(unit_hexstep_t *dev, uint8_t r);
 int unit_hexstep_set_g_value(unit_hexstep_t *dev, uint8_t g);
 int unit_hexstep_set_b_value(unit_hexstep_t *dev, uint8_t b);
-
-int unit_hexstep_set_sensitivity(unit_hexstep_t *dev, uint8_t sensitivity);
-int unit_hexstep_get_sensitivity(unit_hexstep_t *dev, uint8_t *sensitivity);
 
 int unit_hexstep_save_to_flash(unit_hexstep_t *dev, uint8_t save);
 int unit_hexstep_get_version(unit_hexstep_t *dev, uint8_t *version);

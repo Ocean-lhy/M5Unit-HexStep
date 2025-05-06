@@ -56,7 +56,6 @@ void unit_hexstep_simple_demo(unit_hexstep_t *dev)
 void unit_hexstep_test_case_1(unit_hexstep_t *dev)
 {
     uint8_t value, last_value = 0;
-    unit_hexstep_set_sensitivity(dev, 100);
     while (1)
     {
         unit_hexstep_get_value(dev, &value);
@@ -222,27 +221,12 @@ void unit_hexstep_test_case_7(unit_hexstep_t *dev)
     }
 }
 
-void unit_hexstep_test_case_8(unit_hexstep_t *dev)
-{
-    uint8_t sensitivity;
-    while (1)
-    {
-        unit_hexstep_get_sensitivity(dev, &sensitivity);
-        ESP_LOGI(TAG, "SENSITIVITY: %d\n", sensitivity);
-        sensitivity = (esp_random() % 100) + 1; // 1-100
-        unit_hexstep_set_sensitivity(dev, sensitivity);
-        ESP_LOGI(TAG, "random sensitivity: %d\n", sensitivity);
-        sensitivity = 0;
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
 void unit_hexstep_test_case_9(unit_hexstep_t *dev)
 {
     i2c_master_bus_handle_t bsp_i2c_handle;
     i2c_master_dev_handle_t aw9523_h;
     uint8_t data[2];
-    uint8_t led_config, led_brightness, rgb_config, rgb_brightness, switch_state, sensitivity;
+    uint8_t led_config, led_brightness, rgb_config, rgb_brightness, switch_state;
     
     i2c_master_get_bus_handle(BSP_I2C_NUM, &bsp_i2c_handle);
     const i2c_device_config_t aw9523_config = {
@@ -263,8 +247,7 @@ void unit_hexstep_test_case_9(unit_hexstep_t *dev)
     rgb_config = esp_random() % 2;
     rgb_brightness = esp_random() % 100;
     switch_state = esp_random() % 2;
-    sensitivity = esp_random() % 100;
-    ESP_LOGI(TAG, "random config: led config: %d, led brightness: %d, rgb config: %d, rgb brightness: %d, switch state: %d, sensitivity: %d", led_config, led_brightness, rgb_config, rgb_brightness, switch_state, sensitivity);
+    ESP_LOGI(TAG, "random config: led config: %d, led brightness: %d, rgb config: %d, rgb brightness: %d, switch state: %d", led_config, led_brightness, rgb_config, rgb_brightness, switch_state);
     
     // set config
     ESP_LOGI(TAG, "set config");
@@ -273,7 +256,6 @@ void unit_hexstep_test_case_9(unit_hexstep_t *dev)
     unit_hexstep_set_rgb_config(dev, rgb_config);
     unit_hexstep_set_rgb_brightness(dev, rgb_brightness);
     unit_hexstep_set_switch_state(dev, switch_state);
-    unit_hexstep_set_sensitivity(dev, sensitivity);
 
     // check config
     ESP_LOGI(TAG, "check config");
@@ -302,11 +284,6 @@ void unit_hexstep_test_case_9(unit_hexstep_t *dev)
     if (temp != switch_state)
     {
         ESP_LOGI(TAG, "switch state error: %d, %d", temp, switch_state);
-    }
-    unit_hexstep_get_sensitivity(dev, &temp);
-    if (temp != sensitivity)
-    {
-        ESP_LOGI(TAG, "sensitivity error: %d, %d", temp, sensitivity);
     }
     
     // save config
@@ -352,12 +329,6 @@ void unit_hexstep_test_case_9(unit_hexstep_t *dev)
         if (temp != switch_state)
         {
             ESP_LOGI(TAG, "saved switch state error: %d, %d", temp, switch_state);
-        }
-        unit_hexstep_get_sensitivity(dev, &temp);
-        ESP_LOGI(TAG, "sensitivity: %d", temp);
-        if (temp != sensitivity)
-        {
-            ESP_LOGI(TAG, "saved sensitivity error: %d, %d", temp, sensitivity);
         }
     }
 }
@@ -426,7 +397,6 @@ void unit_hexstep_test_case_press(unit_hexstep_t *dev)
     uint8_t set_rgb_brightness, get_rgb_brightness = 0;
     uint8_t set_rgb_value[3], get_rgb_value[3] = {0, 0, 0};
     uint8_t set_switch_state, get_switch_state = 0;
-    uint8_t set_sensitivity, get_sensitivity = 0;
     uint8_t version, last_version = 0;
     while (1)
     {
@@ -482,14 +452,6 @@ void unit_hexstep_test_case_press(unit_hexstep_t *dev)
             ESP_LOGI(TAG, "switch state error: %d, %d", get_switch_state, set_switch_state);
         }
 
-        set_sensitivity = esp_random() % 100 + 1;
-        unit_hexstep_set_sensitivity(dev, set_sensitivity);
-        unit_hexstep_get_sensitivity(dev, &get_sensitivity);
-        if (get_sensitivity != set_sensitivity)
-        {
-            ESP_LOGI(TAG, "sensitivity error: %d, %d", get_sensitivity, set_sensitivity);
-        }
-
         unit_hexstep_get_version(dev, &version);
         if (version != last_version)
         {
@@ -497,6 +459,6 @@ void unit_hexstep_test_case_press(unit_hexstep_t *dev)
             last_version = version;
         }
 
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+        // vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }

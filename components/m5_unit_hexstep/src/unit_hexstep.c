@@ -31,9 +31,6 @@ void unit_hexstep_print_reg(unit_hexstep_t *dev)
     uint8_t r = 0, g = 0, b = 0;
     unit_hexstep_get_rgb(dev, &r, &g, &b);
     ESP_LOGI("HEXSTEP", "RGB 值: R=%d, G=%d, B=%d", r, g, b);
-    uint8_t sensitivity = 0;
-    unit_hexstep_get_sensitivity(dev, &sensitivity);
-    ESP_LOGI("HEXSTEP", "灵敏度: %d", sensitivity);
     uint8_t version = 0;
     unit_hexstep_get_version(dev, &version);
     ESP_LOGI("HEXSTEP", "版本号: 0x%02X", version);
@@ -188,10 +185,6 @@ int unit_hexstep_set_switch_state(unit_hexstep_t *dev, uint8_t state)
 int unit_hexstep_set_rgb_config(unit_hexstep_t *dev, uint8_t config)
 {
     int ret = unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_RGB_CONFIG, &config, 1);
-    if (config == 1)
-    {
-        vTaskDelay(200); // 等待电压稳定 TODO: BUG亮绿灯
-    }
     return ret;
 }
 int unit_hexstep_get_rgb_config(unit_hexstep_t *dev, uint8_t *config)
@@ -252,22 +245,6 @@ int unit_hexstep_set_b_value(unit_hexstep_t *dev, uint8_t b)
     return unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_B_VALUE, &b, 1);
 }
 
-
-/**
- * @brief 设置灵敏度
- * 
- * @param dev HexStep设备句柄
- * @param sensitivity 灵敏度值
- * @return int 0-成功，非0-失败
- */
-int unit_hexstep_set_sensitivity(unit_hexstep_t *dev, uint8_t sensitivity)
-{
-    return unit_hexstep_write_reg(dev, UNIT_HEXSTEP_REG_SENSITIVITY, &sensitivity, 1);
-}
-int unit_hexstep_get_sensitivity(unit_hexstep_t *dev, uint8_t *sensitivity)
-{
-    return unit_hexstep_read_reg(dev, UNIT_HEXSTEP_REG_SENSITIVITY, sensitivity, 1);
-}
 /**
  * @brief 保存配置到Flash
  * 
@@ -320,7 +297,6 @@ int unit_hexstep_set_default_config(unit_hexstep_t *dev)
     unit_hexstep_set_rgb_config(dev, 1);
     unit_hexstep_set_rgb_brightness(dev, 50);
     unit_hexstep_set_rgb(dev, 0, 0, 0);
-    unit_hexstep_set_sensitivity(dev, 100);
     unit_hexstep_save_to_flash(dev, 1);
     unit_hexstep_save_to_flash(dev, 2);
     unit_hexstep_set_address(dev, UNIT_HEXSTEP_DEFAULT_I2C_ADDRESS);

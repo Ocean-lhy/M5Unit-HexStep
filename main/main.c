@@ -135,9 +135,6 @@ void unit_hexstep_command_handler(void *arg)
                     rgb_demo_flag = 0;
                     unit_hexstep_set_b_value(&hexstep_dev, data);
                     break;
-                case UNIT_HEXSTEP_REG_SENSITIVITY:
-                    unit_hexstep_set_sensitivity(&hexstep_dev, data);
-                    break;
                 case UNIT_HEXSTEP_REG_SAVE_FLASH:
                     unit_hexstep_save_to_flash(&hexstep_dev, data);
                     break;
@@ -159,7 +156,6 @@ static void hexstep_task(void *arg)
         // unit_hexstep_test_case_5(&hexstep_dev);
         // unit_hexstep_test_case_6(&hexstep_dev);
         // unit_hexstep_test_case_7(&hexstep_dev);
-        // unit_hexstep_test_case_8(&hexstep_dev);
         // unit_hexstep_test_case_9(&hexstep_dev);
         // unit_hexstep_test_case_10(&hexstep_dev);
         // unit_hexstep_test_case_11(&hexstep_dev, i2c_handle);
@@ -172,7 +168,7 @@ static void hexstep_task(void *arg)
 
 static void guider_task(void *arg)
 {
-    uint8_t value, led_config, led_brightness, led_switch, rgb_config, rgb_brightness, r_value, g_value, b_value, sensitivity, address, version;
+    uint8_t value, led_config, led_brightness, led_switch, rgb_config, rgb_brightness, r_value, g_value, b_value, address, version;
     int ret = unit_hexstep_get_value(&hexstep_dev, &value);
     ret |= unit_hexstep_get_led_config(&hexstep_dev, &led_config);
     ret |= unit_hexstep_get_led_brightness(&hexstep_dev, &led_brightness);
@@ -180,7 +176,6 @@ static void guider_task(void *arg)
     ret |= unit_hexstep_get_rgb_config(&hexstep_dev, &rgb_config);
     ret |= unit_hexstep_get_rgb_brightness(&hexstep_dev, &rgb_brightness);
     ret |= unit_hexstep_get_rgb(&hexstep_dev, &r_value, &g_value, &b_value);
-    ret |= unit_hexstep_get_sensitivity(&hexstep_dev, &sensitivity);
     ret |= unit_hexstep_get_address(&hexstep_dev, &address);
     ret |= unit_hexstep_get_version(&hexstep_dev, &version);
     bsp_display_lock(0);
@@ -242,11 +237,6 @@ static void guider_task(void *arg)
         lv_slider_set_value(guider_ui.screen_slider_B, b_value, LV_ANIM_OFF);
 
         memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "sensitivity: %d%%", sensitivity);
-        lv_label_set_text(guider_ui.screen_label_sensitivity, text);
-        lv_slider_set_value(guider_ui.screen_slider_sensitivity, sensitivity, LV_ANIM_OFF);
-
-        memset(text, 0, sizeof(text));
         snprintf(text, sizeof(text), "addr: 0x%02X", address);
         lv_label_set_text(guider_ui.screen_label_addr, text);
 
@@ -270,7 +260,7 @@ static void guider_task(void *arg)
             last_value = value;
             bsp_display_unlock();
         }
-        vTaskDelay(10 / portTICK_PERIOD_MS); // 10ms延时
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
 
@@ -327,8 +317,6 @@ void app_main(void)
     // unit_hexstep_set_rgb_brightness(&hexstep_dev, 50);
     
     // unit_hexstep_set_rgb(&hexstep_dev, 0, 0, 0);
-
-    // unit_hexstep_set_sensitivity(&hexstep_dev, 100);
     
     // unit_hexstep_save_to_flash(&hexstep_dev, 1);
     

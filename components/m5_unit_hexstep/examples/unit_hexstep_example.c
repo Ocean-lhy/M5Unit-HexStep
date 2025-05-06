@@ -87,12 +87,6 @@ int main()
         printf("设置RGB颜色失败\n");
     }
     
-    // 设置灵敏度
-    ret = unit_hexstep_set_sensitivity(&hexstep_dev, 0x50);
-    if (ret != 0) {
-        printf("设置灵敏度失败\n");
-    }
-    
     // 保存到Flash - 保存LED配置
     ret = unit_hexstep_save_to_flash(&hexstep_dev, 1);
     if (ret != 0) {

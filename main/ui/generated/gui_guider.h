@@ -46,8 +46,6 @@ typedef struct
 	lv_obj_t *screen_slider_R;
 	lv_obj_t *screen_slider_G;
 	lv_obj_t *screen_slider_B;
-	lv_obj_t *screen_label_sensitivity;
-	lv_obj_t *screen_slider_sensitivity;
 	lv_obj_t *screen_btn_rgb_demo;
 	lv_obj_t *screen_btn_rgb_demo_label;
 }lv_ui;

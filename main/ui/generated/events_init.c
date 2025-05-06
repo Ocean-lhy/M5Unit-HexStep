@@ -234,32 +234,6 @@ static void screen_slider_B_event_handler (lv_event_t *e)
     }
 }
 
-static void screen_slider_sensitivity_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_VALUE_CHANGED:
-    {
-        int value = lv_slider_get_value(guider_ui.screen_slider_sensitivity);
-        char text[32];
-        snprintf(text, sizeof(text), "sensitivity: %d%%", value);
-        lv_label_set_text(guider_ui.screen_label_sensitivity, text);
-        printf("screen_slider_sensitivity_event_handler: %d\n", value);
-        break;
-    }
-    case LV_EVENT_RELEASED:
-    {
-        int value = lv_slider_get_value(guider_ui.screen_slider_sensitivity);
-        uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_SENSITIVITY;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
-        printf("screen_slider_sensitivity_event_handler: %d\n", command);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
 static void screen_btn_rgb_demo_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -290,7 +264,6 @@ void events_init_screen (lv_ui *ui)
     lv_obj_add_event_cb(ui->screen_slider_R, screen_slider_R_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_slider_G, screen_slider_G_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_slider_B, screen_slider_B_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->screen_slider_sensitivity, screen_slider_sensitivity_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_btn_rgb_demo, screen_btn_rgb_demo_event_handler, LV_EVENT_ALL, ui);
 }
 

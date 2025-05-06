@@ -404,7 +404,7 @@ void setup_scr_screen(lv_ui *ui)
     ui->screen_label_R = lv_label_create(ui->screen);
     lv_label_set_text(ui->screen_label_R, "R: 0");
     lv_label_set_long_mode(ui->screen_label_R, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->screen_label_R, 3, 111);
+    lv_obj_set_pos(ui->screen_label_R, 3, 120);
     lv_obj_set_size(ui->screen_label_R, 49, 16);
 
     //Write style for screen_label_R, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -427,7 +427,7 @@ void setup_scr_screen(lv_ui *ui)
     ui->screen_label_G = lv_label_create(ui->screen);
     lv_label_set_text(ui->screen_label_G, "G: 0");
     lv_label_set_long_mode(ui->screen_label_G, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->screen_label_G, 3, 133);
+    lv_obj_set_pos(ui->screen_label_G, 3, 150);
     lv_obj_set_size(ui->screen_label_G, 49, 16);
 
     //Write style for screen_label_G, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -450,7 +450,7 @@ void setup_scr_screen(lv_ui *ui)
     ui->screen_label_B = lv_label_create(ui->screen);
     lv_label_set_text(ui->screen_label_B, "B: 0");
     lv_label_set_long_mode(ui->screen_label_B, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->screen_label_B, 3, 155);
+    lv_obj_set_pos(ui->screen_label_B, 3, 180);
     lv_obj_set_size(ui->screen_label_B, 49, 16);
 
     //Write style for screen_label_B, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -474,8 +474,8 @@ void setup_scr_screen(lv_ui *ui)
     lv_slider_set_range(ui->screen_slider_R, 0, 255);
     lv_slider_set_mode(ui->screen_slider_R, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_R, 0, LV_ANIM_OFF);
-    lv_obj_set_pos(ui->screen_slider_R, 60, 114);
-    lv_obj_set_size(ui->screen_slider_R, 140, 8);
+    lv_obj_set_pos(ui->screen_slider_R, 60, 120);
+    lv_obj_set_size(ui->screen_slider_R, 140, 10);
 
     //Write style for screen_slider_R, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_slider_R, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -502,8 +502,8 @@ void setup_scr_screen(lv_ui *ui)
     lv_slider_set_range(ui->screen_slider_G, 0, 255);
     lv_slider_set_mode(ui->screen_slider_G, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_G, 0, LV_ANIM_OFF);
-    lv_obj_set_pos(ui->screen_slider_G, 60, 136);
-    lv_obj_set_size(ui->screen_slider_G, 140, 7);
+    lv_obj_set_pos(ui->screen_slider_G, 60, 150);
+    lv_obj_set_size(ui->screen_slider_G, 140, 10);
 
     //Write style for screen_slider_G, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_slider_G, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -530,8 +530,8 @@ void setup_scr_screen(lv_ui *ui)
     lv_slider_set_range(ui->screen_slider_B, 0, 255);
     lv_slider_set_mode(ui->screen_slider_B, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_slider_B, 0, LV_ANIM_OFF);
-    lv_obj_set_pos(ui->screen_slider_B, 60, 159);
-    lv_obj_set_size(ui->screen_slider_B, 140, 8);
+    lv_obj_set_pos(ui->screen_slider_B, 60, 180);
+    lv_obj_set_size(ui->screen_slider_B, 140, 10);
 
     //Write style for screen_slider_B, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_slider_B, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -553,57 +553,6 @@ void setup_scr_screen(lv_ui *ui)
     lv_obj_set_style_bg_grad_dir(ui->screen_slider_B, LV_GRAD_DIR_NONE, LV_PART_KNOB|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_slider_B, 50, LV_PART_KNOB|LV_STATE_DEFAULT);
 
-    //Write codes screen_label_sensitivity
-    ui->screen_label_sensitivity = lv_label_create(ui->screen);
-    lv_label_set_text(ui->screen_label_sensitivity, "sensitivity :100%");
-    lv_label_set_long_mode(ui->screen_label_sensitivity, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->screen_label_sensitivity, 7, 222);
-    lv_obj_set_size(ui->screen_label_sensitivity, 192, 17);
-
-    //Write style for screen_label_sensitivity, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_label_sensitivity, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_label_sensitivity, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->screen_label_sensitivity, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->screen_label_sensitivity, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_label_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes screen_slider_sensitivity
-    ui->screen_slider_sensitivity = lv_slider_create(ui->screen);
-    lv_slider_set_range(ui->screen_slider_sensitivity, 1, 100);
-    lv_slider_set_mode(ui->screen_slider_sensitivity, LV_SLIDER_MODE_NORMAL);
-    lv_slider_set_value(ui->screen_slider_sensitivity, 100, LV_ANIM_OFF);
-    lv_obj_set_pos(ui->screen_slider_sensitivity, 7, 206);
-    lv_obj_set_size(ui->screen_slider_sensitivity, 184, 8);
-
-    //Write style for screen_slider_sensitivity, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_slider_sensitivity, 60, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_slider_sensitivity, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_slider_sensitivity, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_slider_sensitivity, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_slider_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui->screen_slider_sensitivity, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write style for screen_slider_sensitivity, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_slider_sensitivity, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_slider_sensitivity, lv_color_hex(0x2195f6), LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_slider_sensitivity, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_slider_sensitivity, 50, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-
-    //Write style for screen_slider_sensitivity, Part: LV_PART_KNOB, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_slider_sensitivity, 255, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_slider_sensitivity, lv_color_hex(0x2195f6), LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_slider_sensitivity, LV_GRAD_DIR_NONE, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_slider_sensitivity, 50, LV_PART_KNOB|LV_STATE_DEFAULT);
-
     //Write codes screen_btn_rgb_demo
     ui->screen_btn_rgb_demo = lv_btn_create(ui->screen);
     ui->screen_btn_rgb_demo_label = lv_label_create(ui->screen_btn_rgb_demo);
@@ -612,8 +561,8 @@ void setup_scr_screen(lv_ui *ui)
     lv_obj_align(ui->screen_btn_rgb_demo_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_btn_rgb_demo, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->screen_btn_rgb_demo_label, LV_PCT(100));
-    lv_obj_set_pos(ui->screen_btn_rgb_demo, 11, 177);
-    lv_obj_set_size(ui->screen_btn_rgb_demo, 184, 18);
+    lv_obj_set_pos(ui->screen_btn_rgb_demo, 11, 200);
+    lv_obj_set_size(ui->screen_btn_rgb_demo, 184, 30);
 
     //Write style for screen_btn_rgb_demo, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_btn_rgb_demo, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
