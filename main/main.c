@@ -241,7 +241,7 @@ static void guider_task(void *arg)
         lv_label_set_text(guider_ui.screen_label_addr, text);
 
         memset(text, 0, sizeof(text));
-        snprintf(text, sizeof(text), "version: %d", version);
+        snprintf(text, sizeof(text), "version: %02X", version);
         lv_label_set_text(guider_ui.screen_label_version, text);
     }
     bsp_display_unlock();
@@ -256,6 +256,7 @@ static void guider_task(void *arg)
             char text[32] = {0};
             snprintf(text, sizeof(text), "%01X", value);
             lv_label_set_text(guider_ui.screen_label_value, text);
+            lv_label_set_text(guider_ui.screen_label_value_2, text);
             lv_meter_set_indicator_value(guider_ui.screen_meter_1, guider_ui.screen_meter_1_scale_0_ndline_0, led_switch ? value : 16-value);
             last_value = value;
             bsp_display_unlock();

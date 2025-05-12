@@ -38,7 +38,7 @@ static void screen_slider_led_config_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_led_config);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_LED_CONFIG;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         break;
     }
     default:
@@ -63,7 +63,7 @@ static void screen_slider_led_brightness_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_led_brightness);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_LED_BRIGHTNESS;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         break;
     }
     default:
@@ -80,7 +80,7 @@ static void screen_sw_reversal_event_handler (lv_event_t *e)
         lv_obj_t * status_obj = lv_event_get_target(e);
         uint8_t status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         uint16_t command = ((uint8_t)status << 8) | UNIT_HEXSTEP_REG_SWITCH;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_sw_reversal_event_handler: %d\n", status);
         break;
     }
@@ -98,7 +98,7 @@ static void screen_sw_rgb_event_handler (lv_event_t *e)
         lv_obj_t * status_obj = lv_event_get_target(e);
         uint8_t status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
         uint16_t command = ((uint8_t)status << 8) | UNIT_HEXSTEP_REG_RGB_CONFIG;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_sw_rgb_event_handler: %d\n", status);
         break;
     }
@@ -115,7 +115,7 @@ static void screen_slider_rgb_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_rgb);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_RGB_BRIGHTNESS;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_slider_rgb_event_handler: %d\n", value);
         break;
     }
@@ -131,7 +131,7 @@ static void screen_btn_save_led_event_handler (lv_event_t *e)
     case LV_EVENT_RELEASED:
     {
         uint16_t command = ((uint8_t)1 << 8) | UNIT_HEXSTEP_REG_SAVE_FLASH;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_btn_save_led_event_handler: %d\n", command);
         break;
     }
@@ -147,7 +147,7 @@ static void screen_btn_save_rgb_event_handler (lv_event_t *e)
     case LV_EVENT_RELEASED:
     {
         uint16_t command = ((uint8_t)2 << 8) | UNIT_HEXSTEP_REG_SAVE_FLASH;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_btn_save_rgb_event_handler: %d\n", command);
         break;
     }
@@ -173,7 +173,7 @@ static void screen_slider_R_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_R);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_R_VALUE;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_slider_R_event_handler: %d\n", command);
         break;
     }
@@ -199,7 +199,7 @@ static void screen_slider_G_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_G);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_G_VALUE;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_slider_G_event_handler: %d\n", command);
         break;
     }
@@ -225,7 +225,7 @@ static void screen_slider_B_event_handler (lv_event_t *e)
     {
         int value = lv_slider_get_value(guider_ui.screen_slider_B);
         uint16_t command = ((uint8_t)value << 8) | UNIT_HEXSTEP_REG_B_VALUE;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_slider_B_event_handler: %d\n", command);
         break;
     }
@@ -243,7 +243,7 @@ static void screen_btn_rgb_demo_event_handler (lv_event_t *e)
         lv_slider_set_value(guider_ui.screen_slider_rgb, 100, LV_ANIM_OFF);
         lv_obj_add_state(guider_ui.screen_slider_rgb, LV_STATE_CHECKED);
         uint16_t command = ((uint8_t)3 << 8) | UNIT_HEXSTEP_REG_RGB_DEMO;
-        xQueueSend(lv_command_queue, &command, portMAX_DELAY);
+        xQueueSend(lv_command_queue, &command, 5);
         printf("screen_btn_rgb_demo_event_handler: %d\n", command);
         break;
     }
