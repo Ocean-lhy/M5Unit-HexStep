@@ -144,9 +144,6 @@ void unit_hexstep_command_handler(void *arg)
                     rgb_demo_flag = 0;
                     unit_hexstep_set_b_value(&hexstep_dev, data);
                     break;
-                case UNIT_HEXSTEP_REG_SENSITIVITY:
-                    unit_hexstep_set_sensitivity(&hexstep_dev, data);
-                    break;
                 case UNIT_HEXSTEP_REG_SAVE_FLASH:
                     unit_hexstep_save_to_flash(&hexstep_dev, data);
                     break;
@@ -181,7 +178,7 @@ static void hexstep_task(void *arg)
 
 static void guider_task(void *arg)
 {
-    uint8_t value, led_config, led_brightness, led_switch, rgb_config, rgb_brightness, r_value, g_value, b_value, sensitivity, address, version;
+    uint8_t value, led_config, led_brightness, led_switch, rgb_config, rgb_brightness, r_value, g_value, b_value, address, version;
     int ret = 0;
     unit_hexstep_get_value(&hexstep_dev, &value);
     ret |= unit_hexstep_get_led_config(&hexstep_dev, &led_config);
@@ -190,7 +187,6 @@ static void guider_task(void *arg)
     ret |= unit_hexstep_get_rgb_config(&hexstep_dev, &rgb_config);
     ret |= unit_hexstep_get_rgb_brightness(&hexstep_dev, &rgb_brightness);
     ret |= unit_hexstep_get_rgb(&hexstep_dev, &r_value, &g_value, &b_value);
-    ret |= unit_hexstep_get_sensitivity(&hexstep_dev, &sensitivity);
     ret |= unit_hexstep_get_address(&hexstep_dev, &address);
     ret |= unit_hexstep_get_version(&hexstep_dev, &version);
     uint8_t last_value = value;
@@ -254,8 +250,13 @@ static void guider_task(void *arg)
         uint8_t last_val = 0;
         uint8_t valid_val = 0; // 记录上一次有效计数的值
         uint8_t total_roll = 0;
-        unit_hexstep_set_sensitivity(&hexstep_dev, 100);
         unit_hexstep_get_value(&hexstep_dev, &last_val);
+        bsp_display_lock(0);
+        lv_meter_set_indicator_value(guider_ui.screen_roll_meter_roll, guider_ui.screen_roll_meter_roll_scale_0_ndline_0, last_val);
+        char first_val[8];
+        snprintf(first_val, sizeof(first_val), "%d", last_val);
+        lv_label_set_text(guider_ui.screen_roll_label_1, first_val);
+        bsp_display_unlock();
         valid_val = last_val;
 
         while (1)
@@ -283,7 +284,9 @@ static void guider_task(void *arg)
                 valid_val = value; // 更新有效值
                 char text[8];
                 snprintf(text, sizeof(text), "%d", valid_val);
+                bsp_display_lock(0);
                 lv_label_set_text(guider_ui.screen_roll_label_1, text);
+                bsp_display_unlock();
             }
             
             last_val = value; // 记录本次读取的值
@@ -327,6 +330,7 @@ static void guider_task(void *arg)
         }
         ESP_LOGI(TAG, "开始数码管测试");
         unit_hexstep_set_led_config(&hexstep_dev, 0xFF);
+        unit_hexstep_set_led_brightness(&hexstep_dev, 100);
         // led test
         while (1)
         {
@@ -455,7 +459,7 @@ static void button_left_press_down_cb(void *arg, void *data)
 static void button_left_press_up_cb(void *arg, void *data)
 {
     btn_left_press_flag = 0;
-    ESP_LOGI(TAG, "左键抬起");
+    // ESP_LOGI(TAG, "左键抬起");
 }
 
 static void button_middle_press_down_cb(void *arg, void *data)
@@ -467,7 +471,7 @@ static void button_middle_press_down_cb(void *arg, void *data)
 static void button_middle_press_up_cb(void *arg, void *data)
 {
     btn_middle_press_flag = 0;
-    ESP_LOGI(TAG, "中键抬起");
+    // ESP_LOGI(TAG, "中键抬起");
 }
 
 static void button_right_press_down_cb(void *arg, void *data)
@@ -479,7 +483,7 @@ static void button_right_press_down_cb(void *arg, void *data)
 static void button_right_press_up_cb(void *arg, void *data)
 {
     btn_right_press_flag = 0;
-    ESP_LOGI(TAG, "右键抬起");
+    // ESP_LOGI(TAG, "右键抬起");
 }
 
 static void button_init(void)
@@ -583,8 +587,6 @@ void app_main(void)
     // unit_hexstep_set_rgb_brightness(&hexstep_dev, 50);
     
     // unit_hexstep_set_rgb(&hexstep_dev, 0, 0, 0);
-
-    // unit_hexstep_set_sensitivity(&hexstep_dev, 100);
     
     // unit_hexstep_save_to_flash(&hexstep_dev, 1);
     
